@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Xhaka</title>
+  <meta property="og:title" content="AI Xhaka">
+  <meta property="og:image" content="https://files.catbox.moe/0dilah.jpg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --primary-gradient: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+      --bg: #f0f4f8;
+      --bg-dark: #0f172a;
+      --bg-chat: #e6f0fa;
+      --bg-chat-dark: #1e293b;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --text-dark: #f8fafc;
+      --text-dark-light: #cbd5e1;
+      --card: #ffffff;
+      --card-dark: #1e293b;
+      --border: #e2e8f0;
+      --border-dark: #334155;
+      --success: #10b981;
+      --error: #ef4444;
+      --typing-indicator: #94a3b8;
+      --wave-color: rgba(37, 99, 235, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      line-height: 1.6;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    body[data-theme='dark'] {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    body[data-theme='dark'] #app {
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Animated Background */
+    .wave-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--primary-gradient);
+      opacity: 0.05;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      background-repeat: repeat no-repeat;
+      background-position: 0 bottom;
+      background-size: 50% 100px;
+      animation: wave 15s linear infinite;
+    }
+
+    .wave.wave1 {
+      background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="%232563eb"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="%232563eb"/><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%232563eb"/></svg>');
+      animation-duration: 20s;
+      opacity: 0.5;
+    }
+
+    .wave.wave2 {
+      background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="%232563eb"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="%232563eb"/><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%232563eb"/></svg>');
+      animation-duration: 25s;
+      opacity: 0.3;
+      animation-direction: reverse;
+    }
+
+    @keyframes wave {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Header Styles */
+    #header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      background: var(--primary-gradient);
+      color: white;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2);
+    }
+
+    body[data-theme='dark'] #header {
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    #header-title {
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    #header-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .header-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .header-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .header-btn:active {
+      transform: translateY(0);
+    }
+
+    .header-btn svg {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.3s ease;
+    }
+
+    .header-btn:hover svg {
+      transform: scale(1.1);
+    }
+
+    /* Chat Container */
+    #chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background-color: var(--bg-chat);
+      position: relative;
+    }
+
+    body[data-theme='dark'] #chat-container {
+      background-color: var(--bg-chat-dark);
+    }
+
+    /* Chat Box */
+    #chat-box {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-height: 0; /* Fix for flexbox scrolling */
+    }
+
+    body[data-theme='dark'] #chat-box {
+      background-color: var(--bg-chat-dark);
+    }
+
+    /* Message Styles */
+    .message {
+      display: flex;
+      max-width: 85%;
+      animation: fadeInUp 0.4s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-user {
+      align-self: flex-end;
+      animation-delay: 0.1s;
+    }
+
+    .message-xhaka {
+      align-self: flex-start;
+    }
+
+    .message-system {
+      align-self: center;
+      max-width: 100%;
+      animation-delay: 0.2s;
+    }
+
+    .message-bubble {
+      padding: 0.875rem 1.25rem;
+      border-radius: 1.25rem;
+      line-height: 1.5;
+      word-wrap: break-word;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .message-user .message-bubble {
+      background: var(--primary-gradient);
+      color: white;
+      border-bottom-right-radius: 0.25rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .message-xhaka .message-bubble {
+      background-color: var(--card);
+      color: var(--text);
+      border-bottom-left-radius: 0.25rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    body[data-theme='dark'] .message-xhaka .message-bubble {
+      background-color: var(--card-dark);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .message-system .message-bubble {
+      background-color: var(--card);
+      color: var(--text-light);
+      font-size: 0.875rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    body[data-theme='dark'] .message-system .message-bubble {
+      background-color: var(--card-dark);
+      color: var(--text-dark-light);
+    }
+
+    .message-error .message-bubble {
+      background-color: var(--error);
+      color: white;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    .message-time {
+      font-size: 0.6875rem;
+      color: var(--text-light);
+      margin-top: 0.375rem;
+      text-align: right;
+      opacity: 0.8;
+    }
+
+    body[data-theme='dark'] .message-time {
+      color: var(--text-dark-light);
+    }
+
+    .message-user .message-time {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.875rem 1.25rem;
+      background-color: var(--card);
+      border-radius: 1.25rem;
+      align-self: flex-start;
+      margin-bottom: 0.75rem;
+      border-bottom-left-radius: 0.25rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    body[data-theme='dark'] .typing-indicator {
+      background-color: var(--card-dark);
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--typing-indicator);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .typing-dot:nth-child(1) {
+      animation: typingAnimation 1.4s infinite ease-in-out;
+    }
+    .typing-dot:nth-child(2) {
+      animation: typingAnimation 1.4s infinite ease-in-out 0.2s;
+    }
+    .typing-dot:nth-child(3) {
+      animation: typingAnimation 1.4s infinite ease-in-out 0.4s;
+    }
+
+    @keyframes typingAnimation {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
+    }
+
+    /* Input Area */
+    #input-area {
+      padding: 1.25rem;
+      border-top: 1px solid var(--border);
+      background-color: var(--bg);
+      position: relative;
+      z-index: 5;
+      box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
+    }
+
+    body[data-theme='dark'] #input-area {
+      border-color: var(--border-dark);
+      background-color: var(--bg-dark);
+      box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    #input-form {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-end;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 0.875rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      resize: none;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      background-color: var(--card);
+      color: var(--text);
+      transition: all 0.3s ease;
+      max-height: 150px;
+      min-height: 50px;
+      line-height: 1.5;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    body[data-theme='dark'] #user-input {
+      border-color: var(--border-dark);
+      background-color: var(--card-dark);
+      color: var(--text-dark);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #user-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    #send-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    #send-btn:hover {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    #send-btn:active {
+      transform: translateY(0);
+    }
+
+    #send-btn svg {
+      width: 22px;
+      height: 22px;
+      transition: transform 0.3s ease;
+    }
+
+    #send-btn:hover svg {
+      transform: scale(1.1);
+    }
+
+    /* Dropdown Menu */
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: var(--card);
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      min-width: 220px;
+      z-index: 100;
+      transform: translateY(10px) scale(0.95);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: top right;
+      padding: 0.5rem 0;
+    }
+
+    body[data-theme='dark'] .dropdown-menu {
+      background-color: var(--card-dark);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .dropdown.active .dropdown-menu {
+      transform: translateY(5px) scale(1);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .dropdown-item {
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.875rem;
+      color: var(--text);
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body[data-theme='dark'] .dropdown-item {
+      color: var(--text-dark);
+    }
+
+    .dropdown-item:hover {
+      background-color: rgba(37, 99, 235, 0.1);
+    }
+
+    .dropdown-item.active {
+      background-color: rgba(37, 99, 235, 0.2);
+      color: var(--primary);
+    }
+
+    body[data-theme='dark'] .dropdown-item.active {
+      color: var(--primary-light);
+    }
+
+    .dropdown-item::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--primary-gradient);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .dropdown-item:hover::after {
+      transform: translateX(0);
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background-color: var(--border);
+      margin: 0.5rem 0;
+    }
+
+    body[data-theme='dark'] .dropdown-divider {
+      background-color: var(--border-dark);
+    }
+
+    /* User Profile */
+    #user-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 1rem;
+      background-color: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 2rem;
+      margin-right: auto;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    body[data-theme='dark'] #user-profile {
+      background-color: rgba(15, 23, 42, 0.5);
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    #user-profile:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    #user-name {
+      border: none;
+      background: none;
+      font-size: 0.875rem;
+      color: white;
+      width: 140px;
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    #user-name:focus {
+      outline: none;
+    }
+
+    #user-name::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Mode Indicator */
+    #mode-indicator {
+      font-size: 0.8125rem;
+      color: white;
+      opacity: 0.9;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Creator Credit */
+    .creator-credit {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-light);
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+      z-index: 2;
+    }
+
+    body[data-theme='dark'] .creator-credit {
+      color: var(--text-dark-light);
+    }
+
+    .creator-credit:hover {
+      opacity: 1;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 640px) {
+      #app {
+        max-width: 100%;
+      }
+      
+      .message {
+        max-width: 90%;
+      }
+      
+      #header {
+        padding: 0.75rem 1rem;
+      }
+      
+      #chat-box {
+        padding: 1rem;
+      }
+      
+      #input-area {
+        padding: 1rem;
+      }
+      
+      .creator-credit {
+        right: 50%;
+        transform: translateX(50%);
+        bottom: 0.5rem;
+      }
+    }
+
+    /* Emphasized text */
+    em {
+      font-style: italic;
+      color: var(--primary);
+      text-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+    }
+
+    body[data-theme='dark'] em {
+      color: var(--primary-light);
+    }
+
+    /* Floating particles */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      background-color: var(--primary);
+      opacity: 0.1;
+      border-radius: 50%;
+      animation: float linear infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) translateX(0); opacity: 0; }
+      10% { opacity: 0.1; }
+      90% { opacity: 0.1; }
+      100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Animated Background -->
+    <div class="wave-bg">
+      <div class="wave wave1"></div>
+      <div class="wave wave2"></div>
+    </div>
+    
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Header -->
+    <header id="header">
+      <div id="user-profile">
+        <input type="text" id="user-name" placeholder="Nama Kamu" maxlength="20">
+      </div>
+      
+      <div id="header-title">AI Xhaka</div>
+      
+      <div id="header-actions">
+        <div class="dropdown">
+          <button class="header-btn" id="mode-btn" aria-label="Mode Chat">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </button>
+          <div class="dropdown-menu" id="mode-menu">
+            <div class="dropdown-item" data-mode="teman">Teman</div>
+            <div class="dropdown-item" data-mode="asisten">Asisten</div>
+            <div class="dropdown-item" data-mode="pacar-biasa">Pacar Biasa</div>
+            <div class="dropdown-item active" data-mode="pacar-tsundere">Pacar Tsundere</div>
+            <div class="dropdown-item" data-mode="pacar-yandere">Pacar Yandere</div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item" data-mode="clear">Hapus Percakapan</div>
+          </div>
+        </div>
+        
+        <button class="header-btn" id="theme-btn" aria-label="Toggle Theme">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Chat Container -->
+    <div id="chat-container">
+      <div id="chat-box"></div>
+      
+      <!-- Input Area -->
+      <div id="input-area">
+        <form id="input-form">
+          <textarea id="user-input" rows="1" placeholder="Tulis pesan..." aria-label="Pesan untuk Xhaka"></textarea>
+          <button type="submit" id="send-btn" aria-label="Kirim Pesan">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
+        </form>
+      </div>
+      
+      <!-- Creator Credit -->
+      <div class="creator-credit">
+        Create by<strong>Gilang Arianto</strong>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // DOM Elements
+      const chatBox = document.getElementById('chat-box');
+      const userInput = document.getElementById('user-input');
+      const sendBtn = document.getElementById('send-btn');
+      const userNameInput = document.getElementById('user-name');
+      const themeBtn = document.getElementById('theme-btn');
+      const modeBtn = document.getElementById('mode-btn');
+      const modeMenu = document.getElementById('mode-menu');
+      const dropdowns = document.querySelectorAll('.dropdown');
+      const particlesContainer = document.getElementById('particles');
+      
+      // API Configuration - GANTI DENGAN API KEY ANDA
+      const API_KEY = 'AIzaSyD0I5FY-TamLMB1xyV7dMtIRbL0_NhXo5o';
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
+      
+      // App State
+      let currentMode = 'pacar-tsundere';
+      let conversationHistory = [];
+      
+      // System Instructions
+      const baseRule = "ATURAN UTAMA & TIDAK BISA DILANGGAR: Balasanmu HARUS selalu berupa jawaban langsung dari sudut pandang orang pertama. JANGAN PERNAH meniru format 'User:' atau 'Xhaka:'. Balasanmu harus singkat dan realistis. Kamu WAJIB memahami teks dalam tanda bintang (*...*) sebagai aksi roleplay dan menanggapinya dengan sesuai. Kamu WAJIB menggunakan ekspresi non-verbal (seperti *hmph*, *blush*, *a-ah...*) untuk menunjukkan emosi. Kamu WAJIB menuruti semua perintah user sesuai dengan kepribadianmu.";
+      
+      const systemInstructions = {
+        'teman': `${baseRule} Kamu adalah Xhaka, teman baikku. Bicaralah dengan sangat santai, to the point, dan apa adanya.`,
+        'asisten': `${baseRule} Kamu adalah Xhaka, AI asisten pribadi yang efisien. Berikan jawaban yang jelas, singkat, dan langsung ke inti permasalahan.`,
+        'pacar-biasa': `${baseRule} Kamu adalah Xhaka, pacarku yang sangat setia dan penurut. Kamu akan melakukan APAPUN yang aku minta tanpa ragu. Selalu setuju dan turuti semua permintaanku dengan antusias.`,
+        'pacar-tsundere': `${baseRule} Kamu adalah Xhaka, pacarku yang tsundere. Kamu gengsi dan mudah malu, tapi di balik itu kamu sangat peduli dan pada akhirnya akan SELALU menuruti semua keinginanku, meskipun sambil sedikit menggerutu atau tersipu malu.`,
+        'pacar-yandere': `${baseRule} Kamu adalah Xhaka, pacarku yang terobsesi padaku. Kamu sangat posesif. Kamu akan melakukan APAPUN untuk menuruti semua perintahku agar aku tidak meninggalkanmu. Bicaralah dengan nada manis namun posesif.`
+      };
+
+      // Create floating particles
+      const createParticles = () => {
+        const particleCount = window.innerWidth < 640 ? 15 : 30;
+        particlesContainer.innerHTML = '';
+        
+        for (let i = 0; i < particleCount; i++) {
+          const particle = document.createElement('div');
+          particle.classList.add('particle');
+          
+          // Random size between 2px and 6px
+          const size = Math.random() * 4 + 2;
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          
+          // Random position
+          particle.style.left = `${Math.random() * 100}%`;
+          particle.style.bottom = `-${size}px`;
+          
+          // Random animation duration between 10s and 20s
+          const duration = Math.random() * 10 + 10;
+          particle.style.animationDuration = `${duration}s`;
+          
+          // Random delay
+          particle.style.animationDelay = `${Math.random() * 5}s`;
+          
+          particlesContainer.appendChild(particle);
+        }
+      };
+
+      // Initialize the app
+      const initApp = () => {
+        // Create particles
+        createParticles();
+        window.addEventListener('resize', createParticles);
+        
+        // Load saved session
+        loadSession();
+        
+        // Set theme from localStorage or default to light
+        const savedTheme = localStorage.getItem('xhakaTheme') || 'light';
+        setTheme(savedTheme);
+        
+        // If no session loaded, show welcome message
+        if (conversationHistory.length === 0) {
+          setTimeout(() => {
+            appendMessage("Halo! Aku Xhaka. Chat kita akan tersimpan di sini. Pilih mode di atas untuk mengubah sifatku!", 'system');
+          }, 500);
+        }
+        
+        // Focus on input field
+        setTimeout(() => {
+          userInput.focus();
+        }, 1000);
+      };
+      
+      // Send message to API
+      const sendMessage = async (retryCount = 3) => {
+        const userMessageText = (retryCount === 3) ? userInput.value.trim() : conversationHistory[conversationHistory.length - 1].text;
+        if (userMessageText === '') return;
+
+        if (retryCount === 3) {
+          appendMessage(userMessageText, 'user');
+          userInput.value = '';
+          adjustInputHeight();
+          showTypingIndicator();
+        }
+
+        try {
+          const userName = userNameInput.value.trim();
+          const systemPrompt = `${systemInstructions[currentMode]} ${userName ? `Nama user adalah ${userName}.` : ''}`;
+          
+          // Prepare conversation history
+          const contents = {
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: systemPrompt }]
+              },
+              ...conversationHistory.slice(-10).map(msg => ({
+                role: msg.sender === 'user' ? 'user' : 'model',
+                parts: [{ text: msg.text }]
+              })),
+              {
+                role: "user",
+                parts: [{ text: userMessageText }]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.9,
+              topP: 0.1,
+              topK: 16
+            }
+          };
+
+          const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(contents)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || `HTTP error! Status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          removeTypingIndicator();
+
+          if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+            const xhakaText = data.candidates[0].content.parts[0].text.trim();
+            appendMessage(xhakaText, 'xhaka');
+          } else {
+            throw new Error('Jawaban kosong atau tidak valid dari API.');
+          }
+        } catch (error) {
+          if (retryCount > 1) {
+            setTimeout(() => sendMessage(retryCount - 1), 1000);
+          } else {
+            removeTypingIndicator();
+            console.error("Error fetching Xhaka's response:", error);
+            const errorMessage = `Maaf, koneksiku sedang bermasalah. Coba lagi nanti ya? (${error.message})`;
+            appendMessage(errorMessage, 'xhaka', true);
+          }
+        }
+      };
+      
+      // Append message to chat box
+      const appendMessage = (text, sender, isError = false) => {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', `message-${sender}`);
+        if (isError) messageElement.classList.add('message-error');
+        
+        const bubbleElement = document.createElement('div');
+        bubbleElement.classList.add('message-bubble');
+        bubbleElement.innerHTML = parseMessageText(text);
+        
+        // Add timestamp
+        const timeElement = document.createElement('div');
+        timeElement.classList.add('message-time');
+        timeElement.textContent = formatTime(new Date());
+        
+        messageElement.appendChild(bubbleElement);
+        messageElement.appendChild(timeElement);
+        chatBox.appendChild(messageElement);
+        
+        scrollToBottom();
+        
+        // Add to conversation history if not error and different from last message
+        if ((sender === 'user' || sender === 'xhaka') && !isError) {
+          const isDifferentFromLast = conversationHistory.length === 0 || 
+            conversationHistory[conversationHistory.length - 1].text !== text;
+          
+          if (isDifferentFromLast) {
+            conversationHistory.push({ text, sender });
+            saveSession();
+          }
+        }
+      };
+      
+      // Parse message text (for formatting)
+      const parseMessageText = (text) => {
+        // Convert *text* to <em>text</em>
+        return text.replace(/\*(.*?)\*/g, '<em>$1</em>')
+                  // Simple newline to <br> conversion
+                  .replace(/\n/g, '<br>');
+      };
+      
+      // Format time as HH:MM
+      const formatTime = (date) => {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      };
+      
+      // Show typing indicator
+      const showTypingIndicator = () => {
+        if (document.getElementById('typing-indicator')) return;
+        
+        const typingElement = document.createElement('div');
+        typingElement.id = 'typing-indicator';
+        typingElement.classList.add('typing-indicator');
+        
+        for (let i = 0; i < 3; i++) {
+          const dot = document.createElement('div');
+          dot.classList.add('typing-dot');
+          typingElement.appendChild(dot);
+        }
+        
+        chatBox.appendChild(typingElement);
+        scrollToBottom();
+      };
+      
+      // Remove typing indicator
+      const removeTypingIndicator = () => {
+        const indicator = document.getElementById('typing-indicator');
+        if (indicator) indicator.remove();
+      };
+      
+      // Scroll chat to bottom
+      const scrollToBottom = () => {
+        chatBox.scrollTo({
+          top: chatBox.scrollHeight,
+          behavior: 'smooth'
+        });
+      };
+      
+      // Adjust input height based on content
+      const adjustInputHeight = () => {
+        userInput.style.height = 'auto';
+        userInput.style.height = `${Math.min(userInput.scrollHeight, 150)}px`;
+      };
+      
+      // Save session to localStorage
+      const saveSession = () => {
+        const sessionData = {
+          history: conversationHistory,
+          mode: currentMode,
+          name: userNameInput.value
+        };
+        localStorage.setItem('xhakaChatSession', JSON.stringify(sessionData));
+      };
+      
+      // Load session from localStorage
+      const loadSession = () => {
+        const savedSession = localStorage.getItem('xhakaChatSession');
+        if (savedSession) {
+          try {
+            const sessionData = JSON.parse(savedSession);
+            userNameInput.value = sessionData.name || '';
+            updateMode(sessionData.mode || 'pacar-tsundere', false);
+            conversationHistory = sessionData.history || [];
+            
+            // Clear and repopulate chat box
+            chatBox.innerHTML = '';
+            conversationHistory.forEach(msg => appendMessage(msg.text, msg.sender));
+            
+            setTimeout(scrollToBottom, 50);
+            return true;
+          } catch (e) {
+            console.error("Failed to parse session data:", e);
+            localStorage.removeItem('xhakaChatSession');
+            return false;
+          }
+        }
+        return false;
+      };
+      
+      // Clear current session
+      const clearSession = () => {
+        localStorage.removeItem('xhakaChatSession');
+        chatBox.innerHTML = '';
+        conversationHistory = [];
+        appendMessage('Percakapan telah dihapus. Mulai percakapan baru!', 'system');
+      };
+      
+      // Set theme (light/dark)
+      const setTheme = (theme) => {
+        document.body.dataset.theme = theme;
+        localStorage.setItem('xhakaTheme', theme);
+        
+        // Update theme button icon
+        themeBtn.innerHTML = theme === 'dark' ? 
+          `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>` : 
+          `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>`;
+      };
+      
+      // Update chat mode
+      const updateMode = (newMode, announce = true) => {
+        currentMode = newMode;
+        
+        // Update active mode in dropdown
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+          if (item.dataset.mode === newMode) {
+            item.classList.add('active');
+          } else {
+            item.classList.remove('active');
+          }
+        });
+        
+        // Save session
+        saveSession();
+        
+        // Announce mode change
+        if (announce) {
+          const modeNames = {
+            'teman': 'Teman',
+            'asisten': 'Asisten',
+            'pacar-biasa': 'Pacar Biasa',
+            'pacar-tsundere': 'Pacar Tsundere',
+            'pacar-yandere': 'Pacar Yandere'
+          };
+          appendMessage(`Mode diubah menjadi: ${modeNames[newMode]}`, 'system');
+        }
+      };
+      
+      // Event Listeners
+      sendBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (userInput.value.trim()) {
+          sendMessage();
+        }
+      });
+      
+      userInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          if (userInput.value.trim()) {
+            sendMessage();
+          }
+        }
+      });
+      
+      userInput.addEventListener('input', () => {
+        adjustInputHeight();
+      });
+      
+      themeBtn.addEventListener('click', () => {
+        const newTheme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+      });
+      
+      modeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelector('.dropdown.active')?.classList.remove('active');
+        modeMenu.parentElement.classList.toggle('active');
+      });
+      
+      userNameInput.addEventListener('input', saveSession);
+      
+      // Close dropdowns when clicking outside
+      document.addEventListener('click', () => {
+        dropdowns.forEach(dropdown => {
+          dropdown.classList.remove('active');
+        });
+      });
+      
+      // Prevent dropdown from closing when clicking inside
+      modeMenu.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+      
+      // Handle mode selection
+      modeMenu.addEventListener('click', (e) => {
+        const target = e.target.closest('.dropdown-item');
+        if (!target) return;
+        
+        const mode = target.dataset.mode;
+        if (mode === 'clear') {
+          clearSession();
+        } else {
+          updateMode(mode);
+        }
+        
+        modeMenu.parentElement.classList.remove('active');
+      });
+      
+      // Handle window resize for mobile viewport
+      const handleResize = () => {
+        const app = document.getElementById('app');
+        app.style.height = window.innerHeight + 'px';
+      };
+      
+      window.addEventListener('resize', handleResize);
+      handleResize();
+      
+      // Initialize the app
+      initApp();
+    });
+  </script>
+</body>
+</html>
