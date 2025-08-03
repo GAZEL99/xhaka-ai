@@ -748,11 +748,11 @@
       const particlesContainer = document.getElementById('particles');
       
       // API Configuration - GANTI DENGAN API KEY ANDA
-      const API_KEY = 'AIzaSyD0I5FY-TamLMB1xyV7dMtIRbL0_NhXo5o';
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
-      
+      Const API_KEY = 'AIzaSyB2VvnIJm03Zeiw5KsQcHleArv0VhD55Jg';
+      const MODEL_NAME = 'gemini-2.0-flash';
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
       // App State
-      let currentMode = 'pacar-tsundere';
+      let currentMode = 'asisten';
       let conversationHistory = [];
       
       // System Instructions
